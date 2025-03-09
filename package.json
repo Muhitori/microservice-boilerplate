@@ -1,0 +1,11 @@
+{
+  "name": "microservice-boilerplate",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install-packages": "node scripts/install-packages.js"
+  },
+  "dependencies": {
+    "axios": "^1.8.2"
+  }
+}

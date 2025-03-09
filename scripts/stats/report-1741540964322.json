@@ -1,0 +1,110 @@
+{
+  "timestamp": "2025-03-09T17:22:44.322Z",
+  "testIterations": 1,
+  "services": {
+    "users": {
+      "create": {
+        "success": 1,
+        "failed": 0,
+        "successRate": 100,
+        "timing": {
+          "min": "93.93",
+          "max": "93.93",
+          "avg": "93.93"
+        }
+      },
+      "read": {
+        "success": 1,
+        "failed": 0,
+        "successRate": 100,
+        "timing": {
+          "min": "17.39",
+          "max": "17.39",
+          "avg": "17.39"
+        }
+      },
+      "update": {
+        "success": 0,
+        "failed": 1,
+        "successRate": 0,
+        "timing": {
+          "min": "0.00",
+          "max": "0.00",
+          "avg": "0.00"
+        }
+      },
+      "delete": {
+        "success": 0,
+        "failed": 1,
+        "successRate": 0,
+        "timing": {
+          "min": "0.00",
+          "max": "0.00",
+          "avg": "0.00"
+        }
+      },
+      "list": {
+        "success": 1,
+        "failed": 0,
+        "successRate": 100,
+        "timing": {
+          "min": "10.92",
+          "max": "10.92",
+          "avg": "10.92"
+        }
+      }
+    },
+    "products": {
+      "create": {
+        "success": 1,
+        "failed": 0,
+        "successRate": 100,
+        "timing": {
+          "min": "36.05",
+          "max": "36.05",
+          "avg": "36.05"
+        }
+      },
+      "read": {
+        "success": 0,
+        "failed": 1,
+        "successRate": 0,
+        "timing": {
+          "min": "0.00",
+          "max": "0.00",
+          "avg": "0.00"
+        }
+      },
+      "update": {
+        "success": 0,
+        "failed": 1,
+        "successRate": 0,
+        "timing": {
+          "min": "0.00",
+          "max": "0.00",
+          "avg": "0.00"
+        }
+      },
+      "delete": {
+        "success": 0,
+        "failed": 1,
+        "successRate": 0,
+        "timing": {
+          "min": "0.00",
+          "max": "0.00",
+          "avg": "0.00"
+        }
+      },
+      "list": {
+        "success": 1,
+        "failed": 0,
+        "successRate": 100,
+        "timing": {
+          "min": "13.96",
+          "max": "13.96",
+          "avg": "13.96"
+        }
+      }
+    }
+  }
+}
