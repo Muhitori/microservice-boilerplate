@@ -4,7 +4,7 @@ const path = require("path");
 
 // Configuration
 const API_BASE_URL = "http://localhost:8080"; // API Gateway URL
-const TEST_ITERATIONS = 1; // Number of times to run each test
+const TEST_ITERATIONS = 100; // Number of times to run each test
 const STATS_DIR = path.join(__dirname, "stats");
 
 // Ensure stats directory exists
@@ -12,13 +12,40 @@ if (!fs.existsSync(STATS_DIR)) {
 	fs.mkdirSync(STATS_DIR);
 }
 
-// Test data
-const testUser = {
-	firstName: "test",
-	lastName: "user",
-	email: `test+${Math.random()}@example.com`,
-	password: "password123",
-};
+// Helper function to generate random user data
+function getRandomUser() {
+	const firstNames = [
+		"John",
+		"Jane",
+		"Mike",
+		"Sarah",
+		"David",
+		"Emma",
+		"Alex",
+		"Lisa",
+	];
+	const lastNames = [
+		"Smith",
+		"Johnson",
+		"Williams",
+		"Brown",
+		"Jones",
+		"Garcia",
+		"Miller",
+		"Davis",
+	];
+
+	const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+	const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+	const randomString = Math.random().toString(36).substring(2, 8);
+
+	return {
+		firstName,
+		lastName,
+		email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}.${randomString}@example.com`,
+		password: `Password${randomString}!`,
+	};
+}
 
 const testProduct = {
 	name: "Test Product",
@@ -64,6 +91,8 @@ async function testUserService() {
 	let userId;
 
 	for (let i = 0; i < TEST_ITERATIONS; i++) {
+		const testUser = getRandomUser();
+
 		// Create
 		try {
 			const time = await measureResponseTime(async () => {
@@ -95,7 +124,7 @@ async function testUserService() {
 			const time = await measureResponseTime(async () => {
 				await axios.put(`${API_BASE_URL}/users/${userId}`, {
 					...testUser,
-					name: "Updated Test User",
+					firstName: "Updated " + testUser.firstName,
 				});
 			});
 			stats.users.update.times.push(time);

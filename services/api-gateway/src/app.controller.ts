@@ -8,6 +8,8 @@ import {
 	Body,
 	HttpException,
 	HttpStatus,
+	Delete,
+	Put,
 } from "@nestjs/common";
 import { ClientKafka } from "@nestjs/microservices";
 import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
@@ -31,9 +33,14 @@ export class AppController {
 		this.userClient.subscribeToResponseOf("get.users");
 		this.userClient.subscribeToResponseOf("get.user");
 		this.userClient.subscribeToResponseOf("create.user");
+		this.userClient.subscribeToResponseOf("update.user");
+		this.userClient.subscribeToResponseOf("delete.user");
+
 		this.productClient.subscribeToResponseOf("get.products");
 		this.productClient.subscribeToResponseOf("get.product");
 		this.productClient.subscribeToResponseOf("create.product");
+		this.productClient.subscribeToResponseOf("update.product");
+		this.productClient.subscribeToResponseOf("delete.product");
 
 		// Connect to Kafka clients
 		await Promise.all([
@@ -80,7 +87,7 @@ export class AppController {
 	@ApiResponse({ status: 200, description: "Return user by ID" })
 	getUserById(@Param("id") id: string) {
 		this.logger.log(`Getting user with ID: ${id}`);
-		// Log this request
+
 		this.loggerClient.emit("log.info", {
 			service: "api-gateway",
 			type: "info",
@@ -184,6 +191,148 @@ export class AppController {
 				service: "api-gateway",
 				type: "error",
 				message: `Failed to create product: ${error.message}`,
+				timestamp: new Date().toISOString(),
+			});
+			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@Put("users/:id")
+	@ApiOperation({
+		summary: "Update a user",
+		description: "Updates an existing user in the system",
+	})
+	@ApiResponse({ status: 200, description: "User updated successfully" })
+	@ApiResponse({ status: 400, description: "Bad request" })
+	@ApiResponse({ status: 404, description: "User not found" })
+	async updateUser(@Param("id") id: string, @Body() userData: any) {
+		try {
+			// Emit update user event
+			const result = await firstValueFrom(
+				this.userClient.send("update.user", { id, ...userData })
+			);
+
+			// Log successful user update
+			this.loggerClient.emit("log.info", {
+				service: "api-gateway",
+				type: "info",
+				message: `User updated successfully: ${id}`,
+				timestamp: new Date().toISOString(),
+			});
+
+			return result;
+		} catch (error) {
+			// Log error
+			this.loggerClient.emit("log.error", {
+				service: "api-gateway",
+				type: "error",
+				message: `Failed to update user: ${error.message}`,
+				timestamp: new Date().toISOString(),
+			});
+			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@Put("products/:id")
+	@ApiOperation({
+		summary: "Update a product",
+		description: "Updates an existing product in the system",
+	})
+	@ApiResponse({ status: 200, description: "Product updated successfully" })
+	@ApiResponse({ status: 400, description: "Bad request" })
+	@ApiResponse({ status: 404, description: "Product not found" })
+	async updateProduct(@Param("id") id: string, @Body() productData: any) {
+		try {
+			// Emit update product event
+			const result = await firstValueFrom(
+				this.productClient.send("update.product", { id, ...productData })
+			);
+
+			// Log successful product update
+			this.loggerClient.emit("log.info", {
+				service: "api-gateway",
+				type: "info",
+				message: `Product updated successfully: ${id}`,
+				timestamp: new Date().toISOString(),
+			});
+
+			return result;
+		} catch (error) {
+			// Log error
+			this.loggerClient.emit("log.error", {
+				service: "api-gateway",
+				type: "error",
+				message: `Failed to update product: ${error.message}`,
+				timestamp: new Date().toISOString(),
+			});
+			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@Delete("users/:id")
+	@ApiOperation({
+		summary: "Delete a user",
+		description: "Deletes an existing user from the system",
+	})
+	@ApiResponse({ status: 200, description: "User deleted successfully" })
+	@ApiResponse({ status: 404, description: "User not found" })
+	async deleteUser(@Param("id") id: string) {
+		try {
+			// Emit delete user event
+			const result = await firstValueFrom(
+				this.userClient.send("delete.user", { id })
+			);
+
+			// Log successful user deletion
+			this.loggerClient.emit("log.info", {
+				service: "api-gateway",
+				type: "info",
+				message: `User deleted successfully: ${id}`,
+				timestamp: new Date().toISOString(),
+			});
+
+			return result;
+		} catch (error) {
+			// Log error
+			this.loggerClient.emit("log.error", {
+				service: "api-gateway",
+				type: "error",
+				message: `Failed to delete user: ${error.message}`,
+				timestamp: new Date().toISOString(),
+			});
+			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@Delete("products/:id")
+	@ApiOperation({
+		summary: "Delete a product",
+		description: "Deletes an existing product from the system",
+	})
+	@ApiResponse({ status: 200, description: "Product deleted successfully" })
+	@ApiResponse({ status: 404, description: "Product not found" })
+	async deleteProduct(@Param("id") id: string) {
+		try {
+			// Emit delete product event
+			const result = await firstValueFrom(
+				this.productClient.send("delete.product", { id })
+			);
+
+			// Log successful product deletion
+			this.loggerClient.emit("log.info", {
+				service: "api-gateway",
+				type: "info",
+				message: `Product deleted successfully: ${id}`,
+				timestamp: new Date().toISOString(),
+			});
+
+			return result;
+		} catch (error) {
+			// Log error
+			this.loggerClient.emit("log.error", {
+				service: "api-gateway",
+				type: "error",
+				message: `Failed to delete product: ${error.message}`,
 				timestamp: new Date().toISOString(),
 			});
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

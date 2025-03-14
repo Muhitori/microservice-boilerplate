@@ -12,7 +12,7 @@ import { Product } from "./entities/product.entity";
 			port: parseInt(process.env.POSTGRES_PORT, 10) || 5432,
 			username: process.env.DB_USERNAME,
 			password: process.env.DB_PASSWORD,
-			database: process.env.USER_SERVICE_DB,
+			database: process.env.PRODUCT_SERVICE_DB,
 			entities: [Product],
 			synchronize: process.env.NODE_ENV !== "production",
 			migrationsRun: process.env.NODE_ENV === "production",
