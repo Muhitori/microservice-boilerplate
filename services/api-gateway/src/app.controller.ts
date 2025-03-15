@@ -11,7 +11,7 @@ import {
 	Delete,
 	Put,
 } from "@nestjs/common";
-import { ClientKafka } from "@nestjs/microservices";
+import { HttpService } from "@nestjs/axios";
 import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { AppService } from "./app.service";
 import { firstValueFrom } from "rxjs";
@@ -23,32 +23,12 @@ export class AppController {
 
 	constructor(
 		private readonly appService: AppService,
-		@Inject("USER_SERVICE") private readonly userClient: ClientKafka,
-		@Inject("PRODUCT_SERVICE") private readonly productClient: ClientKafka,
-		@Inject("LOGGER_SERVICE") private readonly loggerClient: ClientKafka
+		@Inject("USER_SERVICE") private readonly userClient: HttpService,
+		@Inject("PRODUCT_SERVICE") private readonly productClient: HttpService,
+		@Inject("LOGGER_SERVICE") private readonly loggerClient: HttpService
 	) {}
 
-	async onModuleInit(): Promise<void> {
-		// Subscribe to response topics
-		this.userClient.subscribeToResponseOf("get.users");
-		this.userClient.subscribeToResponseOf("get.user");
-		this.userClient.subscribeToResponseOf("create.user");
-		this.userClient.subscribeToResponseOf("update.user");
-		this.userClient.subscribeToResponseOf("delete.user");
-
-		this.productClient.subscribeToResponseOf("get.products");
-		this.productClient.subscribeToResponseOf("get.product");
-		this.productClient.subscribeToResponseOf("create.product");
-		this.productClient.subscribeToResponseOf("update.product");
-		this.productClient.subscribeToResponseOf("delete.product");
-
-		// Connect to Kafka clients
-		await Promise.all([
-			this.userClient.connect(),
-			this.productClient.connect(),
-			this.loggerClient.connect(),
-		]);
-	}
+	// No need for onModuleInit with HTTP proxy
 
 	@Get()
 	@ApiOperation({
@@ -63,33 +43,39 @@ export class AppController {
 	@Get("users")
 	@ApiOperation({ summary: "Get all users" })
 	@ApiResponse({ status: 200, description: "Return all users" })
-	getUsers() {
+	async getUsers() {
 		this.logger.log("Getting all users");
-		return this.userClient.send("get.users", {});
+		const response = await firstValueFrom(this.userClient.get("/users"));
+		return response.data;
 	}
 
 	@Get("users/:id")
 	@ApiOperation({ summary: "Get user by ID" })
 	@ApiResponse({ status: 200, description: "Return user by ID" })
-	getUserById(@Param("id") id: string) {
+	async getUserById(@Param("id") id: string) {
 		this.logger.log(`Getting user with ID: ${id}`);
-		return this.userClient.send("get.user", { id });
+		const response = await firstValueFrom(this.userClient.get(`/users/${id}`));
+		return response.data;
 	}
 
 	@Get("products")
 	@ApiOperation({ summary: "Get all products" })
 	@ApiResponse({ status: 200, description: "Return all products" })
-	getProducts() {
+	async getProducts() {
 		this.logger.log("Getting all products");
-		return this.productClient.send("get.products", {});
+		const response = await firstValueFrom(this.productClient.get("/products"));
+		return response.data;
 	}
 
 	@Get("products/:id")
 	@ApiOperation({ summary: "Get product by ID" })
 	@ApiResponse({ status: 200, description: "Return product by ID" })
-	getProductById(@Param("id") id: string) {
+	async getProductById(@Param("id") id: string) {
 		this.logger.log(`Getting product with ID: ${id}`);
-		return this.productClient.send("get.product", { id });
+		const response = await firstValueFrom(
+			this.productClient.get(`/products/${id}`)
+		);
+		return response.data;
 	}
 
 	@Post("users")
@@ -101,11 +87,11 @@ export class AppController {
 	@ApiResponse({ status: 400, description: "Bad request" })
 	async createUser(@Body() userData: any) {
 		try {
-			// Emit create user event
-			const result = await firstValueFrom(
-				this.userClient.send("create.user", userData)
+			// Create user via HTTP
+			const response = await firstValueFrom(
+				this.userClient.post("/users", userData)
 			);
-			return result;
+			return response.data;
 		} catch (error) {
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
@@ -120,11 +106,11 @@ export class AppController {
 	@ApiResponse({ status: 400, description: "Bad request" })
 	async createProduct(@Body() productData: any) {
 		try {
-			// Emit create product event
-			const result = await firstValueFrom(
-				this.productClient.send("create.product", productData)
+			// Create product via HTTP
+			const response = await firstValueFrom(
+				this.productClient.post("/products", productData)
 			);
-			return result;
+			return response.data;
 		} catch (error) {
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
@@ -140,11 +126,11 @@ export class AppController {
 	@ApiResponse({ status: 404, description: "User not found" })
 	async updateUser(@Param("id") id: string, @Body() userData: any) {
 		try {
-			// Emit update user event
-			const result = await firstValueFrom(
-				this.userClient.send("update.user", { id, ...userData })
+			// Update user via HTTP
+			const response = await firstValueFrom(
+				this.userClient.put(`/users/${id}`, userData)
 			);
-			return result;
+			return response.data;
 		} catch (error) {
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
@@ -160,11 +146,11 @@ export class AppController {
 	@ApiResponse({ status: 404, description: "Product not found" })
 	async updateProduct(@Param("id") id: string, @Body() productData: any) {
 		try {
-			// Emit update product event
-			const result = await firstValueFrom(
-				this.productClient.send("update.product", { id, ...productData })
+			// Update product via HTTP
+			const response = await firstValueFrom(
+				this.productClient.put(`/products/${id}`, productData)
 			);
-			return result;
+			return response.data;
 		} catch (error) {
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
@@ -179,11 +165,11 @@ export class AppController {
 	@ApiResponse({ status: 404, description: "User not found" })
 	async deleteUser(@Param("id") id: string) {
 		try {
-			// Emit delete user event
-			const result = await firstValueFrom(
-				this.userClient.send("delete.user", { id })
+			// Delete user via HTTP
+			const response = await firstValueFrom(
+				this.userClient.delete(`/users/${id}`)
 			);
-			return result;
+			return response.data;
 		} catch (error) {
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
@@ -198,11 +184,11 @@ export class AppController {
 	@ApiResponse({ status: 404, description: "Product not found" })
 	async deleteProduct(@Param("id") id: string) {
 		try {
-			// Emit delete product event
-			const result = await firstValueFrom(
-				this.productClient.send("delete.product", { id })
+			// Delete product via HTTP
+			const response = await firstValueFrom(
+				this.productClient.delete(`/products/${id}`)
 			);
-			return result;
+			return response.data;
 		} catch (error) {
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}

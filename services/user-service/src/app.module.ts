@@ -4,6 +4,7 @@ import { ClientsModule, Transport } from "@nestjs/microservices";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 import { User } from "./entities/user.entity";
+import { HealthModule } from "./health/health.module";
 
 @Module({
 	imports: [
@@ -21,6 +22,7 @@ import { User } from "./entities/user.entity";
 			migrationsTableName: "migrations",
 		}),
 		TypeOrmModule.forFeature([User]),
+		HealthModule,
 		ClientsModule.register([
 			{
 				name: "LOGGER_SERVICE",

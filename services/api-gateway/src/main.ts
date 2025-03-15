@@ -1,7 +1,6 @@
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
-import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import * as promClient from "prom-client";
 
 async function bootstrap() {
@@ -19,23 +18,7 @@ async function bootstrap() {
 	const document = SwaggerModule.createDocument(app, config);
 	SwaggerModule.setup("api", app, document);
 
-	// Connect to Kafka microservice
-	app.connectMicroservice<MicroserviceOptions>({
-		transport: Transport.KAFKA,
-		options: {
-			client: {
-				brokers: process.env.KAFKA_BROKERS.split(","),
-				retry: {
-					initialRetryTime: 1000, // Start with 1 second delay
-					retries: 10, // Max 10 retries
-					maxRetryTime: 60000, // Max 60 seconds total
-				},
-			},
-			consumer: {
-				groupId: "api-gateway-consumer",
-			},
-		},
-	});
+	// No need to connect to Kafka microservice with HTTP proxy
 
 	// Setup Prometheus metrics
 	const register = new promClient.Registry();
@@ -47,7 +30,7 @@ async function bootstrap() {
 		register.metrics().then((metrics) => res.end(metrics));
 	});
 
-	await app.startAllMicroservices();
+	// No need to start microservices with HTTP proxy
 	await app.listen(8080);
 	console.log(`Application is running on: ${await app.getUrl()}`);
 }
