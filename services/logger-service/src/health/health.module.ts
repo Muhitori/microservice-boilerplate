@@ -5,7 +5,7 @@ import { HealthService } from "./health.service";
 
 @Module({
 	imports: [
-		ElasticsearchModule.forRoot({
+		ElasticsearchModule.register({
 			node: process.env.ELASTICSEARCH_NODE || "http://elasticsearch:9200",
 		}),
 	],
