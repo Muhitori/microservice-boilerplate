@@ -57,13 +57,6 @@ export class AppController {
 	})
 	@ApiResponse({ status: 200, description: "Return welcome message" })
 	getHello() {
-		// Log this request
-		this.loggerClient.emit("log.info", {
-			service: "api-gateway",
-			type: "info",
-			message: "Home endpoint accessed",
-			timestamp: new Date().toISOString(),
-		});
 		return this.appService.getHello();
 	}
 
@@ -72,13 +65,6 @@ export class AppController {
 	@ApiResponse({ status: 200, description: "Return all users" })
 	getUsers() {
 		this.logger.log("Getting all users");
-		// Log this request
-		this.loggerClient.emit("log.info", {
-			service: "api-gateway",
-			type: "info",
-			message: "Users endpoint accessed",
-			timestamp: new Date().toISOString(),
-		});
 		return this.userClient.send("get.users", {});
 	}
 
@@ -87,13 +73,6 @@ export class AppController {
 	@ApiResponse({ status: 200, description: "Return user by ID" })
 	getUserById(@Param("id") id: string) {
 		this.logger.log(`Getting user with ID: ${id}`);
-
-		this.loggerClient.emit("log.info", {
-			service: "api-gateway",
-			type: "info",
-			message: `User endpoint accessed for ID: ${id}`,
-			timestamp: new Date().toISOString(),
-		});
 		return this.userClient.send("get.user", { id });
 	}
 
@@ -102,13 +81,6 @@ export class AppController {
 	@ApiResponse({ status: 200, description: "Return all products" })
 	getProducts() {
 		this.logger.log("Getting all products");
-		// Log this request
-		this.loggerClient.emit("log.info", {
-			service: "api-gateway",
-			type: "info",
-			message: "Products endpoint accessed",
-			timestamp: new Date().toISOString(),
-		});
 		return this.productClient.send("get.products", {});
 	}
 
@@ -117,13 +89,6 @@ export class AppController {
 	@ApiResponse({ status: 200, description: "Return product by ID" })
 	getProductById(@Param("id") id: string) {
 		this.logger.log(`Getting product with ID: ${id}`);
-		// Log this request
-		this.loggerClient.emit("log.info", {
-			service: "api-gateway",
-			type: "info",
-			message: `Product endpoint accessed for ID: ${id}`,
-			timestamp: new Date().toISOString(),
-		});
 		return this.productClient.send("get.product", { id });
 	}
 
@@ -140,24 +105,8 @@ export class AppController {
 			const result = await firstValueFrom(
 				this.userClient.send("create.user", userData)
 			);
-
-			// Log successful user creation
-			this.loggerClient.emit("log.info", {
-				service: "api-gateway",
-				type: "info",
-				message: `User created successfully: ${result.id}`,
-				timestamp: new Date().toISOString(),
-			});
-
 			return result;
 		} catch (error) {
-			// Log error
-			this.loggerClient.emit("log.error", {
-				service: "api-gateway",
-				type: "error",
-				message: `Failed to create user: ${error.message}`,
-				timestamp: new Date().toISOString(),
-			});
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -175,24 +124,8 @@ export class AppController {
 			const result = await firstValueFrom(
 				this.productClient.send("create.product", productData)
 			);
-
-			// Log successful product creation
-			this.loggerClient.emit("log.info", {
-				service: "api-gateway",
-				type: "info",
-				message: `Product created successfully: ${result.id}`,
-				timestamp: new Date().toISOString(),
-			});
-
 			return result;
 		} catch (error) {
-			// Log error
-			this.loggerClient.emit("log.error", {
-				service: "api-gateway",
-				type: "error",
-				message: `Failed to create product: ${error.message}`,
-				timestamp: new Date().toISOString(),
-			});
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -211,24 +144,8 @@ export class AppController {
 			const result = await firstValueFrom(
 				this.userClient.send("update.user", { id, ...userData })
 			);
-
-			// Log successful user update
-			this.loggerClient.emit("log.info", {
-				service: "api-gateway",
-				type: "info",
-				message: `User updated successfully: ${id}`,
-				timestamp: new Date().toISOString(),
-			});
-
 			return result;
 		} catch (error) {
-			// Log error
-			this.loggerClient.emit("log.error", {
-				service: "api-gateway",
-				type: "error",
-				message: `Failed to update user: ${error.message}`,
-				timestamp: new Date().toISOString(),
-			});
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -247,24 +164,8 @@ export class AppController {
 			const result = await firstValueFrom(
 				this.productClient.send("update.product", { id, ...productData })
 			);
-
-			// Log successful product update
-			this.loggerClient.emit("log.info", {
-				service: "api-gateway",
-				type: "info",
-				message: `Product updated successfully: ${id}`,
-				timestamp: new Date().toISOString(),
-			});
-
 			return result;
 		} catch (error) {
-			// Log error
-			this.loggerClient.emit("log.error", {
-				service: "api-gateway",
-				type: "error",
-				message: `Failed to update product: ${error.message}`,
-				timestamp: new Date().toISOString(),
-			});
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -282,24 +183,8 @@ export class AppController {
 			const result = await firstValueFrom(
 				this.userClient.send("delete.user", { id })
 			);
-
-			// Log successful user deletion
-			this.loggerClient.emit("log.info", {
-				service: "api-gateway",
-				type: "info",
-				message: `User deleted successfully: ${id}`,
-				timestamp: new Date().toISOString(),
-			});
-
 			return result;
 		} catch (error) {
-			// Log error
-			this.loggerClient.emit("log.error", {
-				service: "api-gateway",
-				type: "error",
-				message: `Failed to delete user: ${error.message}`,
-				timestamp: new Date().toISOString(),
-			});
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -317,24 +202,8 @@ export class AppController {
 			const result = await firstValueFrom(
 				this.productClient.send("delete.product", { id })
 			);
-
-			// Log successful product deletion
-			this.loggerClient.emit("log.info", {
-				service: "api-gateway",
-				type: "info",
-				message: `Product deleted successfully: ${id}`,
-				timestamp: new Date().toISOString(),
-			});
-
 			return result;
 		} catch (error) {
-			// Log error
-			this.loggerClient.emit("log.error", {
-				service: "api-gateway",
-				type: "error",
-				message: `Failed to delete product: ${error.message}`,
-				timestamp: new Date().toISOString(),
-			});
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
 	}

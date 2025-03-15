@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { ClientsModule, Transport } from "@nestjs/microservices";
 import { ProductController } from "./product.controller";
 import { ProductService } from "./product.service";
 import { Product } from "./entities/product.entity";
@@ -20,6 +21,21 @@ import { Product } from "./entities/product.entity";
 			migrationsTableName: "migrations",
 		}),
 		TypeOrmModule.forFeature([Product]),
+		ClientsModule.register([
+			{
+				name: "LOGGER_SERVICE",
+				transport: Transport.KAFKA,
+				options: {
+					client: {
+						clientId: "product-logger",
+						brokers: process.env.KAFKA_BROKERS?.split(",") || ["kafka:9092"],
+					},
+					consumer: {
+						groupId: "product-logger-consumer",
+					},
+				},
+			},
+		]),
 	],
 	controllers: [ProductController],
 	providers: [ProductService],
