@@ -39,12 +39,14 @@ function getRandomUser() {
 	const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
 	const randomString = Math.random().toString(36).substring(2, 8);
 
-	return {
+	const user = {
 		firstName,
 		lastName,
 		email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}.${randomString}@example.com`,
 		password: `Password${randomString}!`,
 	};
+
+	return user;
 }
 
 const testProduct = {

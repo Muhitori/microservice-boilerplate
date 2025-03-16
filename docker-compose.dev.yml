@@ -34,6 +34,7 @@ services:
     ports:
       - "8081:8081"
       - "9229:9229" # Debug port
+      - "50051:50051" # gRPC port
     volumes:
       - ./services/user-service:/usr/src/app
       - /usr/src/app/node_modules
@@ -60,6 +61,7 @@ services:
     ports:
       - "8082:8082"
       - "9230:9229" # Debug port (different from user-service)
+      - "50052:50052" # gRPC port
     volumes:
       - ./services/product-service:/usr/src/app
       - /usr/src/app/node_modules
@@ -101,5 +103,8 @@ services:
     command: npm run start:dev
     networks:
       - microservice-network
+networks:
+  microservice-network:
+    driver: bridge
 # Extend from the main docker-compose.yml for other services
 # The development configuration only modifies the microservices

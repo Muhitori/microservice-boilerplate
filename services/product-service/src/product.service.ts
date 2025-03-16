@@ -2,6 +2,7 @@ import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Product } from "./entities/product.entity";
+import { ProductCreate } from "./types/product.types";
 
 @Injectable()
 export class ProductService {
@@ -26,7 +27,7 @@ export class ProductService {
 		return product;
 	}
 
-	async create(productData: Partial<Product>): Promise<Product> {
+	async create(productData: Partial<ProductCreate>): Promise<Product> {
 		this.logger.log("Creating new product");
 		const product = this.productsRepository.create(productData);
 		return this.productsRepository.save(product);
@@ -45,3 +46,4 @@ export class ProductService {
 		await this.productsRepository.remove(product);
 	}
 }
+

@@ -18,7 +18,7 @@ async function bootstrap() {
 	const document = SwaggerModule.createDocument(app, config);
 	SwaggerModule.setup("api", app, document);
 
-	// No need to connect to Kafka microservice with HTTP proxy
+	// Using ClientProxyFactory for Kafka microservice communication
 
 	// Setup Prometheus metrics
 	const register = new promClient.Registry();
@@ -30,7 +30,10 @@ async function bootstrap() {
 		register.metrics().then((metrics) => res.end(metrics));
 	});
 
-	// No need to start microservices with HTTP proxy
+	// Start all microservices
+	await app.startAllMicroservices();
+
+	// Microservices are connected via ClientProxyFactory in the controller
 	await app.listen(8080);
 	console.log(`Application is running on: ${await app.getUrl()}`);
 }

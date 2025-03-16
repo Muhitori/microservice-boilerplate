@@ -10,25 +10,33 @@ import {
 	HttpStatus,
 	Delete,
 	Put,
+	OnModuleInit,
 } from "@nestjs/common";
-import { HttpService } from "@nestjs/axios";
+import { ClientGrpc, ClientKafka } from "@nestjs/microservices";
 import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { AppService } from "./app.service";
-import { firstValueFrom } from "rxjs";
+import { lastValueFrom } from "rxjs";
 
 @ApiTags("api")
 @Controller()
-export class AppController {
+export class AppController implements OnModuleInit {
 	private readonly logger = new Logger(AppController.name);
+
+	private userService: any;
+	private productService: any;
 
 	constructor(
 		private readonly appService: AppService,
-		@Inject("USER_SERVICE") private readonly userClient: HttpService,
-		@Inject("PRODUCT_SERVICE") private readonly productClient: HttpService,
-		@Inject("LOGGER_SERVICE") private readonly loggerClient: HttpService
+		@Inject("USER_SERVICE") private readonly userClient: ClientGrpc,
+		@Inject("PRODUCT_SERVICE") private readonly productClient: ClientGrpc,
+		@Inject("LOGGER_SERVICE") private readonly loggerClient: ClientKafka
 	) {}
 
-	// No need for onModuleInit with HTTP proxy
+	async onModuleInit() {
+		this.userService = this.userClient.getService<any>("UserService");
+		this.productService = this.productClient.getService<any>("ProductService");
+		await this.loggerClient.connect();
+	}
 
 	@Get()
 	@ApiOperation({
@@ -45,8 +53,8 @@ export class AppController {
 	@ApiResponse({ status: 200, description: "Return all users" })
 	async getUsers() {
 		this.logger.log("Getting all users");
-		const response = await firstValueFrom(this.userClient.get("/users"));
-		return response.data;
+
+		return await lastValueFrom(this.userService.getUsers({}));
 	}
 
 	@Get("users/:id")
@@ -54,8 +62,8 @@ export class AppController {
 	@ApiResponse({ status: 200, description: "Return user by ID" })
 	async getUserById(@Param("id") id: string) {
 		this.logger.log(`Getting user with ID: ${id}`);
-		const response = await firstValueFrom(this.userClient.get(`/users/${id}`));
-		return response.data;
+
+		return await lastValueFrom(this.userService.getUser({ id }));
 	}
 
 	@Get("products")
@@ -63,8 +71,8 @@ export class AppController {
 	@ApiResponse({ status: 200, description: "Return all products" })
 	async getProducts() {
 		this.logger.log("Getting all products");
-		const response = await firstValueFrom(this.productClient.get("/products"));
-		return response.data;
+
+		return await lastValueFrom(this.productService.getProducts({}));
 	}
 
 	@Get("products/:id")
@@ -72,10 +80,8 @@ export class AppController {
 	@ApiResponse({ status: 200, description: "Return product by ID" })
 	async getProductById(@Param("id") id: string) {
 		this.logger.log(`Getting product with ID: ${id}`);
-		const response = await firstValueFrom(
-			this.productClient.get(`/products/${id}`)
-		);
-		return response.data;
+
+		return await lastValueFrom(this.productService.getProduct({ id }));
 	}
 
 	@Post("users")
@@ -87,11 +93,30 @@ export class AppController {
 	@ApiResponse({ status: 400, description: "Bad request" })
 	async createUser(@Body() userData: any) {
 		try {
-			// Create user via HTTP
-			const response = await firstValueFrom(
-				this.userClient.post("/users", userData)
-			);
-			return response.data;
+			this.logger.log("Creating a new user", userData);
+
+			// Transform and validate user data according to proto definition
+			const userCreateData = {
+				firstName: userData.firstName,
+				lastName: userData.lastName,
+				email: userData.email,
+				password: userData.password,
+			};
+
+			// Validate required fields
+			if (
+				!userCreateData.firstName ||
+				!userCreateData.lastName ||
+				!userCreateData.email ||
+				!userCreateData.password
+			) {
+				throw new HttpException(
+					"Missing required fields",
+					HttpStatus.BAD_REQUEST
+				);
+			}
+
+			return await lastValueFrom(this.userService.createUser(userCreateData));
 		} catch (error) {
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
@@ -106,11 +131,9 @@ export class AppController {
 	@ApiResponse({ status: 400, description: "Bad request" })
 	async createProduct(@Body() productData: any) {
 		try {
-			// Create product via HTTP
-			const response = await firstValueFrom(
-				this.productClient.post("/products", productData)
+			return await lastValueFrom(
+				this.productService.createProduct(productData)
 			);
-			return response.data;
 		} catch (error) {
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
@@ -126,11 +149,7 @@ export class AppController {
 	@ApiResponse({ status: 404, description: "User not found" })
 	async updateUser(@Param("id") id: string, @Body() userData: any) {
 		try {
-			// Update user via HTTP
-			const response = await firstValueFrom(
-				this.userClient.put(`/users/${id}`, userData)
-			);
-			return response.data;
+			return await lastValueFrom(this.userService.updateUser({ id, userData }));
 		} catch (error) {
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
@@ -146,11 +165,9 @@ export class AppController {
 	@ApiResponse({ status: 404, description: "Product not found" })
 	async updateProduct(@Param("id") id: string, @Body() productData: any) {
 		try {
-			// Update product via HTTP
-			const response = await firstValueFrom(
-				this.productClient.put(`/products/${id}`, productData)
+			return await lastValueFrom(
+				this.productService.updateProduct({ id, productData })
 			);
-			return response.data;
 		} catch (error) {
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
@@ -165,11 +182,7 @@ export class AppController {
 	@ApiResponse({ status: 404, description: "User not found" })
 	async deleteUser(@Param("id") id: string) {
 		try {
-			// Delete user via HTTP
-			const response = await firstValueFrom(
-				this.userClient.delete(`/users/${id}`)
-			);
-			return response.data;
+			return await lastValueFrom(this.userService.deleteUser({ id }));
 		} catch (error) {
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}
@@ -184,11 +197,7 @@ export class AppController {
 	@ApiResponse({ status: 404, description: "Product not found" })
 	async deleteProduct(@Param("id") id: string) {
 		try {
-			// Delete product via HTTP
-			const response = await firstValueFrom(
-				this.productClient.delete(`/products/${id}`)
-			);
-			return response.data;
+			return await lastValueFrom(this.productService.deleteProduct({ id }));
 		} catch (error) {
 			throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
 		}

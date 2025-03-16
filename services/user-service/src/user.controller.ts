@@ -1,8 +1,15 @@
 import { Controller, Logger, Inject, OnModuleInit } from "@nestjs/common";
-import { MessagePattern, Payload, ClientKafka } from "@nestjs/microservices";
+import { ClientKafka } from "@nestjs/microservices";
+import { GrpcMethod } from "@nestjs/microservices";
 import { UserService } from "./user.service";
+import {
+	User,
+	UserId,
+	UpdateUserRequest,
+	UserCreate,
+} from "./types/user.types";
 
-@Controller()
+@Controller("UserService")
 export class UserController implements OnModuleInit {
 	private readonly logger = new Logger(UserController.name);
 
@@ -16,8 +23,8 @@ export class UserController implements OnModuleInit {
 		await this.loggerClient.connect();
 	}
 
-	@MessagePattern("get.users")
-	async getUsers(): Promise<any[]> {
+	@GrpcMethod("UserService", "GetUsers")
+	async getUsers(): Promise<{ users: User[] }> {
 		this.logger.log("Received get.users request");
 
 		// Log this request
@@ -28,11 +35,11 @@ export class UserController implements OnModuleInit {
 			timestamp: new Date().toISOString(),
 		});
 
-		return this.userService.findAll();
+		return { users: await this.userService.findAll() };
 	}
 
-	@MessagePattern("get.user")
-	async getUser(@Payload() data: { id: string }): Promise<any> {
+	@GrpcMethod("UserService", "GetUser")
+	async getUser(data: UserId): Promise<User> {
 		this.logger.log(`Received get.user request for ID: ${data.id}`);
 
 		// Log this request
@@ -46,9 +53,9 @@ export class UserController implements OnModuleInit {
 		return this.userService.findOne(data.id);
 	}
 
-	@MessagePattern("create.user")
-	async createUser(@Payload() data: any): Promise<any> {
-		this.logger.log("Received create.user request");
+	@GrpcMethod("UserService", "CreateUser")
+	async createUser(data: UserCreate): Promise<User> {
+		this.logger.log("Received create.user request", data);
 
 		try {
 			const result = await this.userService.create(data);
@@ -75,8 +82,8 @@ export class UserController implements OnModuleInit {
 		}
 	}
 
-	@MessagePattern("update.user")
-	async updateUser(data: { id: string; userData: any }): Promise<any> {
+	@GrpcMethod("UserService", "UpdateUser")
+	async updateUser(data: UpdateUserRequest): Promise<User> {
 		this.logger.log(`Received update.user request for ID: ${data.id}`);
 
 		try {
@@ -104,8 +111,8 @@ export class UserController implements OnModuleInit {
 		}
 	}
 
-	@MessagePattern("delete.user")
-	async deleteUser(data: { id: string }): Promise<any> {
+	@GrpcMethod("UserService", "DeleteUser")
+	async deleteUser(data: UserId) {
 		this.logger.log(`Received delete.user request for ID: ${data.id}`);
 
 		try {

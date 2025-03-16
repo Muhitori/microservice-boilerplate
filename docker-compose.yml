@@ -18,6 +18,8 @@ services:
       - .env
     environment:
       - API_GATEWAY_PORT=${API_GATEWAY_PORT}
+      - GRPC_TRACE=all
+      - GRPC_VERBOSITY=DEBUG
     networks:
       - microservice-network
 
@@ -27,6 +29,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8081:8081"
+      - "50051:50051"
     volumes:
       - ./services/user-service:/usr/src/app
       - /usr/src/app/node_modules
@@ -39,6 +42,8 @@ services:
     environment:
       - POSTGRES_DB=${USER_SERVICE_DB}
       - USER_SERVICE_PORT=${USER_SERVICE_PORT}
+      - GRPC_TRACE=all
+      - GRPC_VERBOSITY=DEBUG
     networks:
       - microservice-network
 
@@ -48,6 +53,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8082:8082"
+      - "50052:50052"
     volumes:
       - ./services/product-service:/usr/src/app
       - /usr/src/app/node_modules
@@ -60,6 +66,8 @@ services:
     environment:
       - POSTGRES_DB=${PRODUCT_SERVICE_DB}
       - PRODUCT_SERVICE_PORT=${PRODUCT_SERVICE_PORT}
+      - GRPC_TRACE=all
+      - GRPC_VERBOSITY=DEBUG
     networks:
       - microservice-network
 

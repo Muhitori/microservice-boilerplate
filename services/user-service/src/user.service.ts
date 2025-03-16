@@ -2,6 +2,7 @@ import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "./entities/user.entity";
+import { UserCreate } from "./types/user.types";
 
 @Injectable()
 export class UserService {
@@ -26,8 +27,8 @@ export class UserService {
 		return user;
 	}
 
-	async create(userData: Partial<User>): Promise<User> {
-		this.logger.log("Creating new user");
+	async create(userData: Partial<UserCreate>): Promise<User> {
+		this.logger.log("Creating new user", userData);
 		return this.usersRepository.save(userData);
 	}
 

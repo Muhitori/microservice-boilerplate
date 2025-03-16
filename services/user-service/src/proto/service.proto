@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package service;
+
+service UserService {
+  rpc GetUsers (Empty) returns (UserList) {}
+  rpc GetUser (UserId) returns (User) {}
+  rpc CreateUser (UserCreate) returns (User) {}
+  rpc UpdateUser (UpdateUserRequest) returns (User) {}
+  rpc DeleteUser (UserId) returns (Empty) {}
+}
+
+service ProductService {
+  rpc GetProducts (Empty) returns (ProductList) {}
+  rpc GetProduct (ProductId) returns (Product) {}
+  rpc CreateProduct (ProductCreate) returns (Product) {}
+  rpc UpdateProduct (UpdateProductRequest) returns (Product) {}
+  rpc DeleteProduct (ProductId) returns (Empty) {}
+}
+
+service LoggerService {
+  rpc Log (LogRequest) returns (Empty) {}
+}
+
+message Empty {}
+
+message UserId {
+  string id = 1;
+}
+
+message UserCreate {
+  string firstName = 1;
+  string lastName = 2;
+  string email = 3;
+  string password = 4;
+  // Add other user fields as needed
+}
+
+message User {
+  string id = 1;
+  string firstName = 2;
+  string lastName = 3;
+  string email = 4;
+  // Add other user fields as needed
+}
+
+message UserList {
+  repeated User users = 1;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  User userData = 2;
+}
+
+message ProductId {
+  string id = 1;
+}
+
+message Product {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+  // Add other product fields as needed
+}
+
+message ProductCreate {
+  string name = 1;
+  string description = 2;
+  double price = 3;
+  double stock = 4;
+  // Add other user fields as needed
+}
+
+message ProductList {
+  repeated Product products = 1;
+}
+
+message UpdateProductRequest {
+  string id = 1;
+  Product productData = 2;
+}
+
+message LogRequest {
+  string service = 1;
+  string type = 2;
+  string message = 3;
+  string timestamp = 4;
+}

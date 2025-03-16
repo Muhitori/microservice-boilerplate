@@ -2,6 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import * as promClient from "prom-client";
+import { join } from "path";
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -13,14 +14,20 @@ async function bootstrap() {
 			client: {
 				brokers: process.env.KAFKA_BROKERS.split(","),
 				retry: {
-					initialRetryTime: 1000, // Start with 1 second delay
-					retries: 10, // Max 10 retries
-					maxRetryTime: 60000, // Max 60 seconds total
+					initialRetryTime: 1000,
+					retries: 10,
+					maxRetryTime: 60000,
 				},
 			},
-			consumer: {
-				groupId: "user-service-consumer",
-			},
+		},
+	});
+
+	app.connectMicroservice<MicroserviceOptions>({
+		transport: Transport.GRPC,
+		options: {
+			package: "service",
+			protoPath: join(__dirname, "proto/service.proto"),
+			url: `0.0.0.0:50051`,
 		},
 	});
 
@@ -34,9 +41,11 @@ async function bootstrap() {
 		register.metrics().then((metrics) => res.end(metrics));
 	});
 
+	// Start all microservices
 	await app.startAllMicroservices();
-	await app.listen(8081); // Different port than API Gateway
-	console.log(`User Service is running on: ${await app.getUrl()}`);
+
+	// Start HTTP server
+	await app.listen(process.env.USER_SERVICE_PORT || 8081);
 }
 
 bootstrap();

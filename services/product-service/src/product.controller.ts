@@ -1,8 +1,15 @@
 import { Controller, Logger, Inject, OnModuleInit } from "@nestjs/common";
-import { MessagePattern, Payload, ClientKafka } from "@nestjs/microservices";
+import { ClientKafka } from "@nestjs/microservices";
+import { GrpcMethod } from "@nestjs/microservices";
 import { ProductService } from "./product.service";
+import {
+	Product,
+	ProductCreate,
+	ProductId,
+	UpdateProductRequest,
+} from "./types/product.types";
 
-@Controller()
+@Controller("ProductService")
 export class ProductController implements OnModuleInit {
 	private readonly logger = new Logger(ProductController.name);
 
@@ -16,8 +23,8 @@ export class ProductController implements OnModuleInit {
 		await this.loggerClient.connect();
 	}
 
-	@MessagePattern("get.products")
-	async getProducts(): Promise<any[]> {
+	@GrpcMethod("ProductService", "GetProducts")
+	async getProducts(): Promise<{ products: Product[] }> {
 		this.logger.log("Received get.products request");
 
 		// Log this request
@@ -28,11 +35,11 @@ export class ProductController implements OnModuleInit {
 			timestamp: new Date().toISOString(),
 		});
 
-		return this.productService.findAll();
+		return { products: await this.productService.findAll() };
 	}
 
-	@MessagePattern("get.product")
-	async getProduct(@Payload() data: { id: string }): Promise<any> {
+	@GrpcMethod("ProductService", "GetProduct")
+	async getProduct(data: ProductId): Promise<Product> {
 		this.logger.log(`Received get.product request for ID: ${data.id}`);
 
 		// Log this request
@@ -46,8 +53,8 @@ export class ProductController implements OnModuleInit {
 		return this.productService.findOne(data.id);
 	}
 
-	@MessagePattern("create.product")
-	async createProduct(@Payload() data: any): Promise<any> {
+	@GrpcMethod("ProductService", "CreateProduct")
+	async createProduct(data: ProductCreate): Promise<Product> {
 		this.logger.log("Received create.product request");
 
 		try {
@@ -75,10 +82,8 @@ export class ProductController implements OnModuleInit {
 		}
 	}
 
-	@MessagePattern("update.product")
-	async updateProduct(
-		@Payload() data: { id: string; productData: any }
-	): Promise<any> {
+	@GrpcMethod("ProductService", "UpdateProduct")
+	async updateProduct(data: UpdateProductRequest): Promise<Product> {
 		this.logger.log(`Received update.product request for ID: ${data.id}`);
 
 		try {
@@ -109,8 +114,8 @@ export class ProductController implements OnModuleInit {
 		}
 	}
 
-	@MessagePattern("delete.product")
-	async deleteProduct(@Payload() data: { id: string }): Promise<any> {
+	@GrpcMethod("ProductService", "DeleteProduct")
+	async deleteProduct(data: ProductId) {
 		this.logger.log(`Received delete.product request for ID: ${data.id}`);
 
 		try {
@@ -124,7 +129,7 @@ export class ProductController implements OnModuleInit {
 				timestamp: new Date().toISOString(),
 			});
 
-			return result;
+			return {};
 		} catch (error) {
 			// Log error
 			this.loggerClient.emit("log.error", {
@@ -138,3 +143,4 @@ export class ProductController implements OnModuleInit {
 		}
 	}
 }
+
