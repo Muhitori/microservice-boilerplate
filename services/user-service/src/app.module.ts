@@ -9,17 +9,7 @@ import { join } from "path";
 
 @Module({
 	imports: [
-		// gRPC Server Configuration
 		ClientsModule.register([
-			{
-				name: "GRPC_SERVICE",
-				transport: Transport.GRPC,
-				options: {
-					package: "service",
-					protoPath: join(__dirname, "proto/service.proto"),
-					url: `${process.env.USER_SERVICE_HOST || "0.0.0.0"}:${process.env.USER_SERVICE_PORT || 50051}`,
-				},
-			},
 			{
 				name: "LOGGER_SERVICE",
 				transport: Transport.KAFKA,
@@ -54,4 +44,3 @@ import { join } from "path";
 	providers: [UserService],
 })
 export class AppModule {}
-

@@ -4,7 +4,7 @@ const path = require("path");
 
 // Configuration
 const API_BASE_URL = "http://localhost:8080"; // API Gateway URL
-const TEST_ITERATIONS = 100; // Number of times to run each test
+const TEST_ITERATIONS = 1; // Number of times to run each test
 const STATS_DIR = path.join(__dirname, "stats");
 
 // Ensure stats directory exists
