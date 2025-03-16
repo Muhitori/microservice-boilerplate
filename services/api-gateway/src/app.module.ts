@@ -24,7 +24,7 @@ import { HealthModule } from "./health/health.module";
 					options: {
 						package: "service",
 						protoPath: join(__dirname, "proto/service.proto"),
-						url: `user-service:50051`,
+						url: configService.get("microservices.user.grpc.url"),
 					},
 				}),
 				inject: [ConfigService],
@@ -37,7 +37,7 @@ import { HealthModule } from "./health/health.module";
 					options: {
 						package: "service",
 						protoPath: join(__dirname, "proto/service.proto"),
-						url: `product-service:50052`,
+						url: configService.get("microservices.product.grpc.url"),
 					},
 				}),
 				inject: [ConfigService],

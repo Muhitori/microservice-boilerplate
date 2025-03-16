@@ -30,7 +30,7 @@ async function bootstrap() {
 		options: {
 			package: "service",
 			protoPath: join(__dirname, "proto/service.proto"),
-			url: `0.0.0.0:50052`,
+			url: `0.0.0.0:${process.env.PRODUCT_SERVICE_GRPC_PORT}`,
 		},
 	});
 
@@ -45,7 +45,7 @@ async function bootstrap() {
 	});
 
 	await app.startAllMicroservices();
-	await app.listen(8082); // Different port than API Gateway and User Service
+	await app.listen(process.env.PRODUCT_SERVICE_PORT || 8082); // Different port than API Gateway and User Service
 	console.log(`Product Service is running on: ${await app.getUrl()}`);
 }
 

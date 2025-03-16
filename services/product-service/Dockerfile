@@ -14,6 +14,9 @@ COPY package*.json ./
 # Install dependencies (include dev dependencies in development mode)
 RUN npm install
 
+# Install NestJS CLI globally
+RUN npm install -g @nestjs/cli
+
 COPY --chown=node:node . .
 
 # Ensure proto directory exists and files are copied before build

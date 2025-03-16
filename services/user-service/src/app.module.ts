@@ -1,41 +1,55 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ClientsModule, Transport } from "@nestjs/microservices";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 import { User } from "./entities/user.entity";
 import { HealthModule } from "./health/health.module";
-import { join } from "path";
+import microservicesConfig from "./config/microservices.config";
 
 @Module({
 	imports: [
-		ClientsModule.register([
+		ConfigModule.forRoot({
+			isGlobal: true,
+			envFilePath: ".env",
+		}),
+		ConfigModule.forFeature(microservicesConfig),
+		ClientsModule.registerAsync([
 			{
 				name: "LOGGER_SERVICE",
-				transport: Transport.KAFKA,
-				options: {
-					client: {
-						clientId: "user-logger",
-						brokers: process.env.KAFKA_BROKERS?.split(",") || ["kafka:9092"],
+				imports: [ConfigModule],
+				useFactory: async (configService: ConfigService) => ({
+					transport: Transport.KAFKA,
+					options: {
+						client: {
+							clientId: configService.get("microservices.kafka.clientId"),
+							brokers: configService.get("microservices.kafka.brokers"),
+						},
+						consumer: {
+							groupId: configService.get("microservices.kafka.consumerGroupId"),
+						},
 					},
-					consumer: {
-						groupId: "user-logger-consumer",
-					},
-				},
+				}),
+				inject: [ConfigService],
 			},
 		]),
-		TypeOrmModule.forRoot({
-			type: "postgres",
-			host: process.env.DB_HOST,
-			port: parseInt(process.env.POSTGRES_PORT, 10) || 5432,
-			username: process.env.DB_USERNAME,
-			password: process.env.DB_PASSWORD,
-			database: process.env.USER_SERVICE_DB,
-			entities: [User],
-			synchronize: process.env.NODE_ENV !== "production",
-			migrationsRun: process.env.NODE_ENV === "production",
-			migrations: [__dirname + "/migrations/**/*.js"],
-			migrationsTableName: "migrations",
+		TypeOrmModule.forRootAsync({
+			imports: [ConfigModule],
+			useFactory: async (configService: ConfigService) => ({
+				type: "postgres",
+				host: configService.get("microservices.database.host"),
+				port: configService.get("microservices.database.port"),
+				username: configService.get("microservices.database.username"),
+				password: configService.get("microservices.database.password"),
+				database: configService.get("microservices.database.name"),
+				entities: [User],
+				synchronize: process.env.NODE_ENV !== "production",
+				migrationsRun: process.env.NODE_ENV === "production",
+				migrations: [__dirname + "/migrations/**/*.js"],
+				migrationsTableName: "migrations",
+			}),
+			inject: [ConfigService],
 		}),
 		TypeOrmModule.forFeature([User]),
 		HealthModule,

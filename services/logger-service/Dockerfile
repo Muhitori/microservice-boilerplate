@@ -12,6 +12,9 @@ COPY package*.json ./
 # Install dependencies (include dev dependencies in development mode)
 RUN npm install
 
+# Install NestJS CLI globally
+RUN npm install -g @nestjs/cli
+
 COPY --chown=node:node . .
 RUN npm run build
 
