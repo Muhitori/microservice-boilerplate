@@ -12,10 +12,12 @@ RUN npm install
 
 # Copy application code
 COPY --chown=node:node . .
+
+RUN mkdir -p src/proto dist/proto
+RUN cp -r src/proto/* dist/proto/
+
 RUN npm run build
 
-# Ensure proto directory exists in dist
-RUN mkdir -p dist/proto && cp -r src/proto/* dist/proto/
 
 # Use different start commands based on environment
 CMD if [ "$NODE_ENV" = "production" ] ; then npm run start ; else npm run start:dev ; fi

@@ -15,8 +15,11 @@ COPY package*.json ./
 RUN npm install
 
 COPY --chown=node:node . .
+
+RUN mkdir -p src/proto dist/proto
+RUN cp -r src/proto/* dist/proto/
+
 RUN npm run build
-RUN mkdir -p dist/proto && cp -r src/proto/* dist/proto/
 
 # Set environment variable for service name
 ENV SERVICE_NAME=user-service

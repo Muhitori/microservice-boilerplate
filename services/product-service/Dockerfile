@@ -15,11 +15,15 @@ COPY package*.json ./
 RUN npm install
 
 COPY --chown=node:node . .
+
+# Ensure proto directory exists and files are copied before build
+RUN mkdir -p src/proto dist/proto
+RUN cp -r src/proto/* dist/proto/
+
 RUN npm run build
 
 # Set environment variable for service name
 ENV SERVICE_NAME=product-service
-RUN mkdir -p dist/proto && cp -r src/proto/* dist/proto/
 
 # Use different start commands based on environment
 CMD if [ "$NODE_ENV" = "production" ] ; then npm run start ; else npm run start:dev ; fi
