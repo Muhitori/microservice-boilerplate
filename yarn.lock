@@ -2649,9 +2649,6 @@ __metadata:
   dependencies:
     "@eslint/js": "npm:^9.8.0"
     "@nestjs/cli": "npm:^11.0.5"
-    "@nestjs/common": "npm:^11.0.0"
-    "@nestjs/core": "npm:^11.0.0"
-    "@nestjs/platform-express": "npm:^11.0.0"
     "@nestjs/schematics": "npm:^11.0.0"
     "@nestjs/testing": "npm:^11.0.0"
     "@nx/docker": "npm:21.4.1"
@@ -2679,8 +2676,6 @@ __metadata:
     jsonc-eslint-parser: "npm:^2.1.0"
     nx: "npm:21.4.1"
     prettier: "npm:^2.6.2"
-    reflect-metadata: "npm:^0.1.13"
-    rxjs: "npm:^7.8.0"
     supertest: "npm:^7.0.0"
     ts-jest: "npm:^29.2.6"
     ts-loader: "npm:^9.2.3"
