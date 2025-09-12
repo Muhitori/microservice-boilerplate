@@ -53,7 +53,7 @@ import microservicesConfig from './config/microservices.config';
         migrations: [__dirname + '/migrations/**/*.js'],
         migrationsTableName: 'migrations',
         extra: {
-          max: 1000,
+          max: 100,
           min: 50,
           idleTimeoutMillis: 30000,
           connectionTimeoutMillis: 5000,
