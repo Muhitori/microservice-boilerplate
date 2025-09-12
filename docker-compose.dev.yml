@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  # NestJS Microservices with development configuration
+  api-gateway:
+    build:
+      context: ./apps/api-gateway
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=development
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./apps/api-gateway:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - kafka
+      - redis
+    env_file:
+      - .env
+    environment:
+      - API_GATEWAY_PORT=${API_GATEWAY_PORT}
+      - NODE_ENV=development
+    command: npm run start:dev
+    networks:
+      - microservice-network
+
+  user-service:
+    build:
+      context: ./apps/user-service
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=development
+    ports:
+      - '8081:8081'
+      - '9229:9229' # Debug port
+      - '50051:50051' # gRPC port
+    volumes:
+      - ./apps/user-service:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - kafka
+      - redis
+      - postgres
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${USER_SERVICE_DB}
+      - USER_SERVICE_PORT=${USER_SERVICE_PORT}
+      - NODE_ENV=development
+    command: npm run start:dev
+    networks:
+      - microservice-network
+
+  product-service:
+    build:
+      context: ./apps/product-service
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=development
+    ports:
+      - '8082:8082'
+      - '9230:9229' # Debug port (different from user-service)
+      - '50052:50052' # gRPC port
+    volumes:
+      - ./apps/product-service:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - kafka
+      - redis
+      - postgres
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${PRODUCT_SERVICE_DB}
+      - PRODUCT_SERVICE_PORT=${PRODUCT_SERVICE_PORT}
+      - NODE_ENV=development
+    command: npm run start:dev
+    networks:
+      - microservice-network
+
+  logger-service:
+    build:
+      context: ./apps/logger-service
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=development
+    ports:
+      - '8083:8083'
+      - '9231:9229' # Debug port (different from other services)
+    volumes:
+      - ./apps/logger-service:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - kafka
+      - elasticsearch
+      - logstash
+    env_file:
+      - .env
+    environment:
+      - LOGGER_SERVICE_PORT=${LOGGER_SERVICE_PORT}
+      - NODE_ENV=development
+    command: npm run start:dev
+    networks:
+      - microservice-network
+networks:
+  microservice-network:
+    driver: bridge
+# Extend from the main docker-compose.yml for other services
+# The development configuration only modifies the microservices
