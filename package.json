@@ -40,6 +40,7 @@
     "eslint-config-prettier": "^10.0.0",
     "eslint-plugin-prettier": "^5.2.3",
     "jest": "^29.7.0",
+    "jsonc-eslint-parser": "^2.1.0",
     "nx": "21.4.1",
     "prettier": "^2.6.2",
     "supertest": "^7.0.0",
@@ -53,11 +54,17 @@
     "typescript-eslint": "^8.29.0",
     "webpack-cli": "^5.1.4"
   },
-  "workspaces": {
-    "packages": [
-      "apps/*",
-      "packages/*"
-    ]
-  },
-  "packageManager": "yarn@4.9.4"
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "libs/*"
+  ],
+  "packageManager": "yarn@4.9.4",
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0"
+  }
 }

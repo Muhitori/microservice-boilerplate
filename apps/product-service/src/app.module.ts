@@ -6,7 +6,7 @@ import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 import { Product } from './entities/product.entity';
 import microservicesConfig from './config/microservices.config';
-import { HealthModule } from './health/health.module';
+import { HealthModule } from '@muhitori/health';
 
 @Module({
   imports: [

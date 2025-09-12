@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
-import { HealthModule } from './health/health.module';
+import { HealthModule } from '@muhitori/health';
 import microservicesConfig from './config/microservices.config';
 
 @Module({

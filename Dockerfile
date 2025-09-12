@@ -19,7 +19,7 @@
   
   # Build *only* the target service
   ARG SERVICE
-  RUN yarn nx build ${SERVICE}
+  RUN yarn nx build ${SERVICE} --skip-nx-cache
   
   # Focus only on production deps for the service
   RUN yarn workspaces focus @muhitori/${SERVICE} --production \
@@ -36,6 +36,8 @@
   
   COPY --from=builder /usr/src/app/node_modules ./node_modules
   COPY --from=builder /usr/src/app/apps/${SERVICE}/dist ./dist
+  COPY --from=builder /usr/src/app/dist/libs ./node_modules/@muhitori
+
   COPY --from=builder /usr/src/app/apps/${SERVICE}/package.json ./package.json
   
   CMD ["node", "dist/main.js"]

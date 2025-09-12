@@ -4,7 +4,7 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { HealthModule } from './health/health.module';
+import { HealthModule } from '@muhitori/health';
 import microservicesConfig from './config/microservices.config';
 
 @Module({
