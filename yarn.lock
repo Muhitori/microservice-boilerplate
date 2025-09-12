@@ -2606,6 +2606,7 @@ __metadata:
     "@nestjs/swagger": "npm:^11.0.6"
     "@nestjs/terminus": "npm:^11.0.0"
     "@nestjs/typeorm": "npm:^11.0.0"
+    "@willsoto/nestjs-prometheus": "npm:^6.0.2"
     axios: "npm:^1.12.0"
     class-transformer: "npm:^0.5.1"
     class-validator: "npm:^0.14.2"
@@ -4881,6 +4882,16 @@ __metadata:
     webpack-dev-server:
       optional: true
   checksum: 10c0/36079d34971ff99a58b66b13f4184dcdd8617853c48cccdbc3f9ab7ea9e5d4fcf504e873c298ea7aa15e0b51ad2c4aee4d7a70bd7d9364e60f57b0eb93ca15fc
+  languageName: node
+  linkType: hard
+
+"@willsoto/nestjs-prometheus@npm:^6.0.2":
+  version: 6.0.2
+  resolution: "@willsoto/nestjs-prometheus@npm:6.0.2"
+  peerDependencies:
+    "@nestjs/common": ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
+    prom-client: ^15.0.0
+  checksum: 10c0/227a32447dc7d4a880058e69fbe6133772e8753466fb886b397a6b1d9760a0ed55a7ba6370e111e0b68717818eec0788352ffca68b51d455f43043fe74f44a25
   languageName: node
   linkType: hard
 

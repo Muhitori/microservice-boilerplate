@@ -1,10 +1,15 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
-import { ConfigModule } from '@nestjs/config';
+import { TerminusModule } from '@nestjs/terminus';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { HealthController } from './health.controller';
 
 @Module({
-  imports: [HttpModule, ConfigModule],
+  imports: [
+    TerminusModule,
+    PrometheusModule.register({
+      defaultMetrics: { enabled: true },
+    }),
+  ],
   controllers: [HealthController],
 })
 export class HealthModule {}
