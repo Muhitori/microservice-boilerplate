@@ -1,18 +1,46 @@
-import { Controller } from "@nestjs/common";
-import { MessagePattern } from "@nestjs/microservices";
-import { HealthService } from "./health.service";
+import { Controller, Get, Res } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import * as promClient from 'prom-client';
+import { Response } from 'express';
 
-@Controller()
+@ApiTags('health')
+@Controller('health')
 export class HealthController {
-	constructor(private readonly healthService: HealthService) {}
+  private readonly register: promClient.Registry;
+  private readonly upGauge: promClient.Gauge;
 
-	@MessagePattern("health.check")
-	async getHealth() {
-		return this.healthService.checkHealth();
-	}
+  constructor() {
+    // Create a new registry for health metrics
+    this.register = new promClient.Registry();
 
-	@MessagePattern("health.db")
-	async getDbHealth() {
-		return this.healthService.checkDbConnection();
-	}
+    // Create an up gauge to indicate service status (1 = up, 0 = down)
+    this.upGauge = new promClient.Gauge({
+      name: 'product_service_up',
+      help: 'Indicates if the Product Service is up (1) or down (0)',
+      registers: [this.register],
+    });
+
+    // Set the service as up
+    this.upGauge.set(1);
+
+    // Add default metrics to the registry
+    promClient.collectDefaultMetrics({ register: this.register });
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: 'Simple health check endpoint with Prometheus metrics',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Product service is running with Prometheus metrics',
+  })
+  async healthCheck(@Res() response: Response) {
+    // Set Prometheus content type
+    response.set('Content-Type', this.register.contentType);
+
+    // Get metrics and send them as the response
+    const metrics = await this.register.metrics();
+    response.send(metrics);
+  }
 }

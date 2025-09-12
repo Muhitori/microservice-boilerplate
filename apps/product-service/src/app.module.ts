@@ -6,6 +6,7 @@ import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 import { Product } from './entities/product.entity';
 import microservicesConfig from './config/microservices.config';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import microservicesConfig from './config/microservices.config';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([Product]),
+    HealthModule,
   ],
   controllers: [ProductController],
   providers: [ProductService],

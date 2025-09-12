@@ -1,13 +1,10 @@
-import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { HealthController } from "./health.controller";
-import { HealthService } from "./health.service";
-import { User } from "../entities/user.entity";
+import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
+import { HealthController } from './health.controller';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([User])],
-	controllers: [HealthController],
-	providers: [HealthService],
-	exports: [HealthService],
+  imports: [HttpModule, ConfigModule],
+  controllers: [HealthController],
 })
 export class HealthModule {}

@@ -1,16 +1,10 @@
-import { Module } from "@nestjs/common";
-import { ElasticsearchModule } from "@nestjs/elasticsearch";
-import { HealthController } from "./health.controller";
-import { HealthService } from "./health.service";
+import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
+import { HealthController } from './health.controller';
 
 @Module({
-	imports: [
-		ElasticsearchModule.register({
-			node: process.env.ELASTICSEARCH_NODE || "http://elasticsearch:9200",
-		}),
-	],
-	controllers: [HealthController],
-	providers: [HealthService],
-	exports: [HealthService],
+  imports: [HttpModule, ConfigModule],
+  controllers: [HealthController],
 })
 export class HealthModule {}

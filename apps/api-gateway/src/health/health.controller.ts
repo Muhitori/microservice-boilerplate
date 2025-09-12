@@ -1,39 +1,44 @@
-import { Controller, Get } from "@nestjs/common";
-import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
-import { HealthService } from "./health.service";
+import { Controller, Get, Res } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import * as promClient from 'prom-client';
+import { Response } from 'express';
 
-@ApiTags("health")
-@Controller("health")
+@ApiTags('health')
+@Controller('health')
 export class HealthController {
-	constructor(private readonly healthService: HealthService) {}
+  private readonly register: promClient.Registry;
+  private readonly upGauge: promClient.Gauge;
 
-	@Get()
-	@ApiOperation({ summary: "Get health status of all services" })
-	@ApiResponse({
-		status: 200,
-		description: "Return health status of all services",
-	})
-	async getHealth() {
-		return this.healthService.checkAllServices();
-	}
+  constructor() {
+    // Create a new registry for health metrics
+    this.register = new promClient.Registry();
+    
+    // Create an up gauge to indicate service status (1 = up, 0 = down)
+    this.upGauge = new promClient.Gauge({
+      name: 'api_gateway_up',
+      help: 'Indicates if the API Gateway is up (1) or down (0)',
+      registers: [this.register]
+    });
+    
+    // Set the service as up
+    this.upGauge.set(1);
+    
+    // Add default metrics to the registry
+    promClient.collectDefaultMetrics({ register: this.register });
+  }
 
-	@Get("user")
-	@ApiOperation({ summary: "Get health status of user service" })
-	@ApiResponse({
-		status: 200,
-		description: "Return health status of user service",
-	})
-	async getUserServiceHealth() {
-		return { health: await this.healthService.checkUserService() };
-	}
-
-	@Get("product")
-	@ApiOperation({ summary: "Get health status of product service" })
-	@ApiResponse({
-		status: 200,
-		description: "Return health status of product service",
-	})
-	async getProductServiceHealth() {
-		return { health: await this.healthService.checkProductService() };
-	}
+  @Get()
+  @ApiOperation({ summary: 'Simple health check endpoint with Prometheus metrics' })
+  @ApiResponse({
+    status: 200,
+    description: 'API Gateway is running with Prometheus metrics',
+  })
+  async healthCheck(@Res() response: Response) {
+    // Set Prometheus content type
+    response.set('Content-Type', this.register.contentType);
+    
+    // Get metrics and send them as the response
+    const metrics = await this.register.metrics();
+    response.send(metrics);
+  }
 }
