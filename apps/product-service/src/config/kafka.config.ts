@@ -1,9 +1,11 @@
-import { registerAs } from "@nestjs/config";
+import { registerAs } from '@nestjs/config';
 
 export const kafkaConfig = {
-	brokers: process.env.KAFKA_BROKERS?.split(",") || ["kafka:9092"],
-	clientId: "product-logger",
-	consumerGroupId: "product-logger-consumer",
+  brokers: process.env.KAFKA_BROKERS?.split(',') || ['kafka:9092'],
+  clientId: process.env.KAFKA_PRODUCT_LOGGER_CLIENT_ID || 'product-logger',
+  consumerGroupId:
+    process.env.KAFKA_PRODUCT_LOGGER_CONSUMER_GROUP_ID ||
+    'product-logger-consumer',
 };
 
-export default registerAs("kafka", () => kafkaConfig);
+export default registerAs('kafka', () => kafkaConfig);

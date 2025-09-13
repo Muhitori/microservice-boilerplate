@@ -49,13 +49,17 @@ import { HealthModule } from '@muhitori/health';
           transport: Transport.KAFKA,
           options: {
             client: {
-              clientId: 'api-gateway-logger',
-              brokers: configService
-                .get('microservices.kafka.brokers')
-                ?.split(',') || ['kafka:9092'],
+              clientId:
+                configService.get('microservices.kafka.clientId') ||
+                'api-gateway-logger',
+              brokers: configService.get('microservices.kafka.brokers') || [
+                'kafka:9092',
+              ],
             },
             consumer: {
-              groupId: 'api-gateway-logger-consumer',
+              groupId:
+                configService.get('microservices.kafka.consumerGroupId') ||
+                'api-gateway-logger-consumer',
             },
           },
         }),
