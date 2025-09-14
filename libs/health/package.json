@@ -2,16 +2,16 @@
   "name": "@muhitori/health",
   "version": "0.0.1",
   "private": true,
-  "main": "./src/index.js",
-  "module": "./src/index.js",
-  "types": "./src/index.d.ts",
+  "main": "./index.js",
+  "module": "./index.js",
+  "types": "./index.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
       "development": "./src/index.ts",
-      "types": "./src/index.d.ts",
-      "import": "./src/index.js",
-      "default": "./src/index.js"
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "default": "./index.js"
     }
   },
   "nx": {
@@ -26,7 +26,7 @@
           "outputPath": "dist/libs/health",
           "tsConfig": "libs/health/tsconfig.lib.json",
           "packageJson": "libs/health/package.json",
-          "main": "libs/health/src/index.ts",
+          "main": "libs/health/index.ts",
           "assets": [
             "libs/health/*.md"
           ]

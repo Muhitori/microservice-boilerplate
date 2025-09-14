@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "rootDir": "src",
+    "rootDir": ".",
     "outDir": "../../dist/libs/health",
     "tsBuildInfoFile": "../../dist/libs/health/tsconfig.lib.tsbuildinfo",
     "emitDeclarationOnly": false,
@@ -14,8 +14,11 @@
     "noImplicitAny": true,
     "noFallthroughCasesInSwitch": true,
     "experimentalDecorators": true,
-    "strictBindCallApply": false
+    "strictBindCallApply": false,
+    "declaration": true,
+    "declarationMap": true,
+    "composite": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["**/*.ts"],
   "references": []
 }

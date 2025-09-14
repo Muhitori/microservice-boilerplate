@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/health"
+    },
+    {
       "path": "./tsconfig.app.json"
     }
   ]
