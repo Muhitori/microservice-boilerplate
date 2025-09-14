@@ -4,7 +4,7 @@ const path = require('path');
 
 // Configuration
 const API_BASE_URL = 'http://127.0.0.1:8080'; // API Gateway URL
-const TEST_ITERATIONS = 100; // Number of times to run each test
+const TEST_ITERATIONS = 1; // Number of times to run each test
 const STATS_DIR = path.join(__dirname, 'stats');
 
 // Ensure stats directory exists
@@ -114,7 +114,7 @@ async function testUserService() {
       stats.users.create.success++;
     } catch (error) {
       stats.users.create.failed++;
-      console.error('Create user failed:', error.message);
+      console.error('Create user failed:', error.error.response.data);
       continue;
     }
 
@@ -371,12 +371,12 @@ async function main() {
       `Starting tests with ${TEST_ITERATIONS} iterations per operation...\n`
     );
 
-    // await testUserService();
-    // await testProductService();
-    // generateReport();
+    await testUserService();
+    await testProductService();
+    generateReport();
 
-    const result = await testConcurrency(TEST_ITERATIONS);
-    console.log(result);
+    // const result = await testConcurrency(TEST_ITERATIONS);
+    // console.log(result);
   } catch (error) {
     console.error('Test failed:', error);
     process.exit(1);

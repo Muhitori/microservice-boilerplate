@@ -3,13 +3,14 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "dev": "nx run-many -t serve",
     "build": "docker compose -f docker-compose.infrastructure.yml -f docker-compose.yml build",
     "start": "docker compose -f docker-compose.infrastructure.yml -f docker-compose.yml up -d",
     "stop": "docker compose -f docker-compose.infrastructure.yml -f docker-compose.yml down",
     "restart": "docker compose -f docker-compose.infrastructure.yml -f docker-compose.yml restart",
-    "infra:start": "docker compose -f docker-compose.infrastructure.yml up -d",
-    "infra:stop": "docker compose -f docker-compose.infrastructure.yml down",
-    "infra:restart": "docker compose -f docker-compose.infrastructure.yml restart"
+    "start:infra": "docker compose -f docker-compose.infrastructure.yml up -d",
+    "stop:infra": "docker compose -f docker-compose.infrastructure.yml down",
+    "restart:infra": "docker compose -f docker-compose.infrastructure.yml restart"
   },
   "private": true,
   "devDependencies": {
