@@ -19,7 +19,7 @@
   
   # Build *only* the target service
   ARG SERVICE
-  RUN yarn nx run-many --target=build --projects=health,${SERVICE} --skip-nx-cache
+  RUN yarn nx build ${SERVICE} --skip-nx-cache
   
   # Focus only on production deps for the service
   RUN yarn workspaces focus @muhitori/${SERVICE} --production \
